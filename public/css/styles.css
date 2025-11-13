@@ -208,3 +208,110 @@ footer,
     grid-template-columns: 1fr 1fr;
   }
 }
+
+/* =============================
+   Classification Page Styling
+============================= */
+
+/* Page container */
+main, .content-wrapper {
+  width: 90%;
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding-bottom: 3rem;
+}
+
+/* Heading */
+h1 {
+  text-align: center;
+  font-size: 2.4rem;
+  margin-bottom: 2rem;
+  color: #222;
+  font-weight: 700;
+}
+
+/* Message block (when enabled later) */
+.message {
+  background-color: #fff8e1;
+  border-left: 6px solid #ffb300;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  font-size: 1rem;
+  color: #444;
+}
+
+/* ===========================================
+   Inventory Grid / Vehicle Card Styling
+=========================================== */
+
+/* The grid wrapper created by <%- grid %> */
+.vehicle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+/* Each vehicle card */
+.vehicle-card {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+  padding-bottom: 1rem;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-4px);
+}
+
+/* Vehicle image */
+.vehicle-card img {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Vehicle title */
+.vehicle-card h3 {
+  font-size: 1.2rem;
+  margin: 0.8rem 1rem 0.3rem;
+  color: #111;
+}
+
+/* Subtitle or price */
+.vehicle-card p {
+  margin: 0.2rem 1rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+
+/* CTA button */
+.vehicle-card a {
+  display: inline-block;
+  margin: 0.8rem 1rem 0;
+  padding: 0.6rem 1rem;
+  background-color: #0077cc;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: background-color 0.2s ease;
+}
+
+.vehicle-card a:hover {
+  background-color: #005fa3;
+}
+
+/* Mobile optimization */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .vehicle-card img {
+    height: 150px;
+  }
+}
