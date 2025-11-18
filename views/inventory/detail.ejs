@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('../partials/head') %>
+  <style>
+    .vehicle-detail {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+    .vehicle-detail img {
+      max-width: 450px;
+      width: 100%;
+      border-radius: 10px;
+    }
+    .vehicle-info {
+      max-width: 450px;
+      flex: 1;
+    }
+    .price {
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: green;
+      margin-bottom: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .vehicle-detail {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <%- nav %>
+  </header>
+
+  <main>
+    <h1><%= title %></h1>
+    <%- vehicleHTML %>
+  </main>
+
+  <footer>
+    <%- include('../partials/footer') %>
+  </footer>
+</body>
+</html>
