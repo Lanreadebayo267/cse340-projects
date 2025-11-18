@@ -14,7 +14,7 @@ const inventoryRoute = require("./routes/inventoryRoute")
 const utilRoute = require("./routes/utilRoute")
 
 // UTILITIES
-const utilities = require("./utilities/index")  // <-- FORCE INDEX.JS EXPLICITLY
+const utilities = require("./utilities/index")
 
 /* ******************************************
  * View Engine
@@ -24,32 +24,48 @@ app.use(expressLayouts)
 app.set("layout", "layouts/layout")
 
 /* ******************************************
+ * Middleware to set nav globally
+ ******************************************/
+app.use(async (req, res, next) => {
+  try {
+    res.locals.nav = await utilities.getNav()
+  } catch (err) {
+    console.error("Failed to set nav middleware:", err)
+    res.locals.nav = '<ul><li><a href="/">Home</a></li></ul>'
+  }
+  next()
+})
+
+/* ******************************************
  * Routes
  ******************************************/
 app.use(static)
-
-// HOME ROUTE
 app.get("/", utilities.handleErrors(baseController.buildHome))
-
-// INVENTORY ROUTES
 app.use("/inv", inventoryRoute)
-
-// UTIL ROUTES
 app.use("/", utilRoute)
 
-// 404 Handler
+/* ******************************************
+ * 404 Handler
+ ******************************************/
 app.use(async (req, res, next) => {
   next({ status: 404, message: "Sorry, we appear to have lost that page." })
 })
 
 /* ******************************************
- * GLOBAL ERROR HANDLER
+ * Global Error Handler
  ******************************************/
 app.use(async (err, req, res, next) => {
-  const nav = await utilities.getNav()
+  let nav = '<ul><li><a href="/">Home</a></li></ul>'
+  try {
+    nav = await utilities.getNav()
+  } catch (errNav) {
+    console.error("Error loading nav for error page:", errNav)
+  }
+
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
+
   const message =
-    err.status == 404
+    err.status === 404
       ? err.message
       : "Oh no! There was a crash. Maybe try a different route?"
 
@@ -67,5 +83,5 @@ const port = process.env.PORT || 5500
 const host = process.env.HOST || "localhost"
 
 app.listen(port, () => {
-  console.log(`app listening on ${host}:${port}`)
+  console.log(`App listening on ${host}:${port}`)
 })
