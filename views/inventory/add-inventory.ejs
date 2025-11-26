@@ -1,0 +1,53 @@
+<%- include('../partials/header') %>
+
+<h1>Add New Inventory</h1>
+
+<!-- Flash messages -->
+<% if (messages.notice) { %>
+  <p style="color:green;"><%= messages.notice %></p>
+<% } %>
+
+<!-- Validation errors -->
+<% if (errors && errors.length > 0) { %>
+  <ul style="color:red;">
+    <% errors.forEach(e => { %>
+      <li><%= e.msg %></li>
+    <% }) %>
+  </ul>
+<% } %>
+
+<form action="/inv/add-inventory" method="POST">
+  <label>Make</label>
+  <input type="text" name="inv_make" value="<%= inv_make %>" required>
+
+  <label>Model</label>
+  <input type="text" name="inv_model" value="<%= inv_model %>" required>
+
+  <label>Year</label>
+  <input type="number" name="inv_year" value="<%= inv_year %>" required>
+
+  <label>Price</label>
+  <input type="number" name="inv_price" value="<%= inv_price %>" required>
+
+  <label>Color</label>
+  <input type="text" name="inv_color" value="<%= inv_color %>" required>
+
+  <label>Mileage</label>
+  <input type="number" name="inv_miles" value="<%= inv_miles %>" required>
+
+  <label>Description</label>
+  <textarea name="inv_description"><%= inv_description %></textarea>
+
+  <label>Image URL</label>
+  <input type="text" name="inv_image" value="<%= inv_image %>">
+
+  <label>Thumbnail URL</label>
+  <input type="text" name="inv_thumbnail" value="<%= inv_thumbnail %>">
+
+  <label>Classification</label>
+  <%- classificationsSelect %>
+
+  <button type="submit">Add Inventory</button>
+</form>
+
+<%- include('../partials/footer') %>

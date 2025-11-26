@@ -1,0 +1,48 @@
+<main>
+  <h1><%= title %></h1>
+
+  <!-- Flash Message -->
+  <% if (locals.notice) { %>
+    <div class="notice"><%= notice %></div>
+  <% } %>
+
+  <form action="/account/register" method="post">
+
+    <label for="fname">First Name</label>
+    <input 
+      type="text" 
+      id="fname" 
+      name="account_firstname" 
+      required
+      value="<%= locals.account_firstname %>"
+    >
+
+    <label for="lname">Last Name</label>
+    <input 
+      type="text" 
+      id="lname" 
+      name="account_lastname" 
+      required
+      value="<%= locals.account_lastname %>"
+    >
+
+    <label for="email">Email</label>
+    <input 
+      type="email" 
+      id="email" 
+      name="account_email" 
+      required
+      value="<%= locals.account_email %>"
+    >
+
+    <label for="password">Password</label>
+    <input 
+      type="password" 
+      id="password" 
+      name="account_password" 
+      required
+    >
+
+    <button type="submit">Register</button>
+  </form>
+</main>

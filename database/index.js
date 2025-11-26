@@ -1,7 +1,7 @@
 const { Pool } = require("pg");
 require("dotenv").config();
 
-// Use SSL in production (Render requires it)
+// Use SSL only in production
 const useSSL = process.env.NODE_ENV === "production";
 
 const pool = new Pool({

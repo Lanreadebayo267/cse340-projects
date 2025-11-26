@@ -1,110 +1,95 @@
-// utilities/index.js
 const invModel = require("../models/inventory-model")
 
-/* ******************************************
- * Navigation Builder
- ******************************************/
-async function getNav() {
+const utilities = {}
+
+/* ===============================
+   BUILD NAVIGATION MENU
+================================ */
+utilities.getNav = async function () {
   try {
     const data = await invModel.getClassifications()
-    const rows = data.rows || []
+    let nav = "<ul>"
 
-    let list = "<ul>"
-    list += '<li><a href="/" title="Home page">Home</a></li>'
-
-    rows.forEach((row) => {
-      list += `<li>
-        <a href="/inv/type/${row.classification_id}"
-        title="See our inventory of ${row.classification_name} vehicles">
-        ${row.classification_name}</a>
-      </li>`
+    data.rows.forEach(row => {
+      nav += `
+        <li>
+          <a href="/inv/type/${row.classification_id}">
+            ${row.classification_name}
+          </a>
+        </li>`
     })
 
-    list += "</ul>"
-    return list
-  } catch (err) {
-    console.error("Failed to build nav:", err)
-    return '<ul><li><a href="/">Home</a></li></ul>'
+    nav += "</ul>"
+    return nav
+  } catch (error) {
+    console.error("Navigation Build Error:", error)
+    return "<ul><li><a href='#'>Error Loading Navigation</a></li></ul>"
   }
 }
 
-/* ******************************************
- * Classification Grid Builder
- ******************************************/
-async function buildClassificationGrid(data) {
-  let grid = ""
+/* ===============================
+   BUILD CLASSIFICATION SELECT LIST
+================================ */
+utilities.buildClassificationList = function (classificationData, selectedId) {
+  let select = `<select name="classification_id" id="classification_id" required>`
+  select += `<option value="">Choose a Classification</option>`
 
-  if (data && data.length > 0) {
-    grid = '<ul id="inv-display">'
-    data.forEach((vehicle) => {
-      grid += `
-        <li>
-          <a href="/inv/details/${vehicle.inv_id}">
-            <img src="${vehicle.inv_thumbnail}" alt="Image of ${vehicle.inv_make} ${vehicle.inv_model}">
-          </a>
-          <div class="namePrice">
-            <hr />
-            <h2>
-              <a href="/inv/details/${vehicle.inv_id}">
-                ${vehicle.inv_make} ${vehicle.inv_model}
-              </a>
-            </h2>
-            <span>$${new Intl.NumberFormat("en-US").format(vehicle.inv_price)}</span>
-          </div>
-        </li>
-      `
-    })
-    grid += "</ul>"
-  } else {
-    grid = '<p class="notice">Sorry, no matching vehicles could be found.</p>'
-  }
+  classificationData.forEach(row => {
+    const isSelected = selectedId == row.classification_id ? "selected" : ""
+    select += `<option value="${row.classification_id}" ${isSelected}>
+                 ${row.classification_name}
+               </option>`
+  })
 
+  select += `</select>`
+  return select
+}
+
+/* ===============================
+   BUILD CLASSIFICATION GRID
+================================ */
+utilities.buildClassificationGrid = function (vehicles) {
+  let grid = '<div class="vehicle-grid">'
+
+  vehicles.forEach(vehicle => {
+    grid += `
+      <div class="vehicle-card">
+        <a href="/inv/details/${vehicle.inv_id}">
+          <img src="${vehicle.inv_thumbnail}" alt="${vehicle.inv_make} ${vehicle.inv_model}">
+        </a>
+        <h3>${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}</h3>
+        <p>Price: $${vehicle.inv_price}</p>
+      </div>
+    `
+  })
+
+  grid += "</div>"
   return grid
 }
 
-/* ******************************************
- * Error Handler Wrapper
- ******************************************/
-const handleErrors =
-  (fn) =>
-  (req, res, next) =>
+/* ===============================
+   BUILD VEHICLE DETAIL PAGE
+================================ */
+utilities.buildVehicleDetail = function (vehicle) {
+  return `
+    <section class="vehicle-detail">
+      <img src="${vehicle.inv_image}" alt="${vehicle.inv_make} ${vehicle.inv_model}">
+      <h2>${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}</h2>
+      <p>${vehicle.inv_description}</p>
+      <p><strong>Price:</strong> $${vehicle.inv_price}</p>
+      <p><strong>Miles:</strong> ${vehicle.inv_miles}</p>
+      <p><strong>Color:</strong> ${vehicle.inv_color}</p>
+    </section>
+  `
+}
+
+/* ===============================
+   ERROR HANDLER WRAPPER
+================================ */
+utilities.handleErrors = function (fn) {
+  return function (req, res, next) {
     Promise.resolve(fn(req, res, next)).catch(next)
-
-/* ******************************************
- * Vehicle Detail HTML Builder
- ******************************************/
-function buildVehicleDetail(vehicle) {
-  try {
-    const price = Number(vehicle.inv_price).toLocaleString("en-US", {
-      style: "currency",
-      currency: "USD",
-    })
-
-    const miles = Number(vehicle.inv_mileage || 0).toLocaleString("en-US")
-
-    return `
-      <section class="vehicle-detail">
-        <img src="${vehicle.inv_image || vehicle.inv_thumbnail}" 
-        alt="Image of ${vehicle.inv_make} ${vehicle.inv_model}">
-        
-        <div class="vehicle-info">
-          <h2>${vehicle.inv_year} ${vehicle.inv_make} ${vehicle.inv_model}</h2>
-          <p class="price">${price}</p>
-          <p><strong>Mileage:</strong> ${miles} miles</p>
-          <p><strong>Color:</strong> ${vehicle.inv_color}</p>
-          <p><strong>Description:</strong> ${vehicle.inv_description}</p>
-        </div>
-      </section>
-    `
-  } catch (err) {
-    console.error("Failed to build vehicle detail:", err)
-    return "<p class='notice'>Vehicle details unavailable.</p>"
   }
 }
 
-module.exports = {
-  getNav,
-  buildClassificationGrid,
-  buildVehicleDetail,
-  handleErrors,
-}
+module.exports = utilities

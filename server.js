@@ -4,7 +4,8 @@
 const express = require("express")
 const expressLayouts = require("express-ejs-layouts")
 require("dotenv").config()
-
+const session = require("express-session")
+const pool = require('./database/')
 const app = express()
 
 // ROUTES & CONTROLLERS
@@ -12,9 +13,35 @@ const static = require("./routes/static")
 const baseController = require("./controllers/baseController")
 const inventoryRoute = require("./routes/inventoryRoute")
 const utilRoute = require("./routes/utilRoute")
+const accountRoute = require("./routes/accountRoute")
+const bodyParser = require("body-parser")
 
 // UTILITIES
 const utilities = require("./utilities/index")
+
+/* ***********************
+ * Middleware
+ ************************/
+app.use(session({
+  store: new (require('connect-pg-simple')(session))({
+    createTableIfMissing: true,
+    pool,
+  }),
+  secret: process.env.SESSION_SECRET,
+  resave: true,
+  saveUninitialized: true,
+  name: 'sessionId',
+}))
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+// Express Messages Middleware
+app.use(require('connect-flash')())
+app.use(function(req, res, next){
+  res.locals.messages = require('express-messages')(req, res)
+  next()
+})
 
 /* ******************************************
  * View Engine
@@ -43,6 +70,7 @@ app.use(static)
 app.get("/", utilities.handleErrors(baseController.buildHome))
 app.use("/inv", inventoryRoute)
 app.use("/", utilRoute)
+app.use("/account", accountRoute)
 
 /* ******************************************
  * 404 Handler

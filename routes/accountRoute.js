@@ -1,2 +1,35 @@
-router.get("/login", utilities.handleErrors(accController.buildLogin))
-router.post("/login", utilities.handleErrors(accController.login))
+const express = require("express")
+const router = new express.Router()
+const utilities = require("../utilities")
+const accountController = require("../controllers/accountController")
+const accountValidate = require("../utilities/account-validation")
+
+
+// Deliver Login View
+router.get("/login", utilities.handleErrors(accountController.buildLogin))
+
+// Deliver Registration View
+router.get("/register", utilities.handleErrors(accountController.buildRegister))
+
+// Process registration
+router.post('/register', utilities.handleErrors(accountController.registerAccount))
+
+// Process Login (POST)
+router.post("/login", utilities.handleErrors(accountController.login))
+
+router.post(
+  "/register",
+  accountValidate.registrationRules(),
+  accountValidate.regValidate,
+  accountController.registerAccount
+)
+
+// Process the login attempt
+router.post(
+    "/login",
+    (req, res) => {
+        res.status(200).send('login process')
+    }
+)
+
+module.exports = router
