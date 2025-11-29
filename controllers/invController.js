@@ -10,11 +10,14 @@ async function buildManagementView(req, res, next) {
   const classificationData = await invModel.getClassifications()
   const classificationSelect = utilities.buildClassificationList(classificationData.rows)
 
+  const message = req.flash("notice")
+
   res.render("./inventory/management", {
     title: "Inventory Management",
     nav,
-    errors: null,
-    classificationSelect
+    errors: [],
+    classificationSelect,
+    message
   })
 }
 
@@ -25,7 +28,6 @@ async function buildByClassificationId(req, res, next) {
   const classificationId = req.params.classificationId
 
   const data = await invModel.getInventoryByClassificationId(classificationId)
-
   const vehicles = data.rows || []
   const grid = utilities.buildClassificationGrid(vehicles)
 
@@ -49,14 +51,12 @@ async function buildDetailView(req, res, next) {
   const inv_id = req.params.inv_id
 
   const data = await invModel.getInventoryById(inv_id)
-
   if (!data.rows.length) {
     throw new Error("Vehicle not found")
   }
 
   const vehicle = data.rows[0]
   const detail = utilities.buildVehicleDetail(vehicle)
-
   const nav = await utilities.getNav()
 
   res.render("./inventory/detail", {
@@ -71,10 +71,14 @@ async function buildDetailView(req, res, next) {
 **************************************** */
 async function buildAddClassification(req, res) {
   const nav = await utilities.getNav()
-  res.render("./inventory/add-classification", {
+  const message = req.flash("notice")
+
+  res.render("inventory/add-classification", {
     title: "Add New Classification",
     nav,
-    errors: null
+    errors: [],
+    message,
+    classification_name: ""
   })
 }
 
@@ -85,18 +89,24 @@ async function addClassification(req, res) {
   const { classification_name } = req.body
   const nav = await utilities.getNav()
 
-  const addResult = await invModel.addClassification(classification_name)
-
-  if (addResult.rowCount > 0) {
-    req.flash("notice", "New classification added successfully.")
-    return res.redirect("/inv")
+  try {
+    const addResult = await invModel.addClassification(classification_name)
+    if (addResult.rowCount > 0) {
+      req.flash("notice", "New classification added successfully.")
+      return res.redirect("/inv")
+    }
+  } catch (error) {
+    console.error("Error adding classification:", error)
   }
 
+  // If insertion fails, render the form again
   req.flash("notice", "Failed to add classification.")
-  res.status(500).render("./inventory/add-classification", {
+  res.status(500).render("inventory/add-classification", {
     title: "Add New Classification",
     nav,
-    errors: null
+    errors: [],
+    message: req.flash("notice"),
+    classification_name
   })
 }
 
@@ -108,11 +118,14 @@ async function buildAddInventory(req, res) {
   const classificationData = await invModel.getClassifications()
   const classificationSelect = utilities.buildClassificationList(classificationData.rows)
 
-  res.render("./inventory/add-inventory", {
+  const message = req.flash("notice")
+  res.render("inventory/add-inventory", {
     title: "Add New Inventory",
     nav,
-    errors: null,
-    classificationSelect
+    errors: [],
+    classificationSelect,
+    stickyData: {},  // empty initially
+    message
   })
 }
 
@@ -121,7 +134,6 @@ async function buildAddInventory(req, res) {
 **************************************** */
 async function addInventory(req, res) {
   const nav = await utilities.getNav()
-
   const {
     inv_make,
     inv_model,
@@ -135,7 +147,33 @@ async function addInventory(req, res) {
     classification_id
   } = req.body
 
-  const addResult = await invModel.addInventory(
+  try {
+    const addResult = await invModel.addInventory(
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classification_id
+    )
+
+    if (addResult.rowCount > 0) {
+      req.flash("notice", "New vehicle added successfully.")
+      return res.redirect("/inv")
+    }
+  } catch (error) {
+    console.error("Error adding vehicle:", error)
+  }
+
+  // If insertion fails, rebuild classification select with stickiness
+  const classificationData = await invModel.getClassifications()
+  const classificationSelect = utilities.buildClassificationList(classificationData.rows, classification_id)
+
+  const stickyData = {
     inv_make,
     inv_model,
     inv_year,
@@ -146,22 +184,16 @@ async function addInventory(req, res) {
     inv_miles,
     inv_color,
     classification_id
-  )
-
-  if (addResult.rowCount > 0) {
-    req.flash("notice", "New vehicle added successfully.")
-    return res.redirect("/inv")
   }
 
   req.flash("notice", "Failed to add vehicle.")
-  const classificationData = await invModel.getClassifications()
-  const classificationSelect = utilities.buildClassificationList(classificationData.rows, classification_id)
-
-  res.status(500).render("./inventory/add-inventory", {
+  res.status(500).render("inventory/add-inventory", {
     title: "Add New Inventory",
     nav,
-    errors: null,
-    classificationSelect
+    errors: [],
+    classificationSelect,
+    stickyData,
+    message: req.flash("notice")
   })
 }
 

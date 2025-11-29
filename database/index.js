@@ -1,27 +1,19 @@
-const { Pool } = require("pg");
-require("dotenv").config();
-
-// Use SSL only in production
-const useSSL = process.env.NODE_ENV === "production";
+const { Pool } = require("pg")
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: useSSL ? { rejectUnauthorized: false } : false,
-});
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+})
 
-// Export a unified query function
 module.exports = {
-    query: async (text, params) => {
-        try {
-            const res = await pool.query(text, params);
-            if (process.env.NODE_ENV === "development") {
-                console.log("executed query", { text });
-            }
-            return res;
-        } catch (err) {
-            console.error("Database query error", { text, err });
-            throw err;
-        }
-    },
-    pool,
-};
+  async query(text, params) {
+    try {
+      return await pool.query(text, params)
+    } catch (err) {
+      console.error("Database query error", { text, err })
+      throw err
+    }
+  }
+}

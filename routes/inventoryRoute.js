@@ -48,4 +48,15 @@ router.get(
   utilities.handleErrors(invController.buildDetailView)
 )
 
+router.get("/test", (req, res) => {
+  res.render("inventory/add-classification", {
+    title: "Test",
+    nav: "",
+    notice: "",
+    errors: [],
+    classification_name: ""
+  })
+})
+
+
 module.exports = router

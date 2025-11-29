@@ -1,9 +1,5 @@
-// models/inventory-model.js
 const pool = require("../database/")
 
-/* ===============================
-   ADD CLASSIFICATION
-================================ */
 async function addClassification(classification_name) {
   const sql = `
     INSERT INTO classification (classification_name)
@@ -14,16 +10,10 @@ async function addClassification(classification_name) {
   return pool.query(sql, values)
 }
 
-/* ===============================
-   GET CLASSIFICATIONS
-================================ */
 async function getClassifications() {
   return pool.query("SELECT * FROM classification ORDER BY classification_name")
 }
 
-/* ===============================
-   ADD INVENTORY
-================================ */
 async function addInventory(
   inv_make,
   inv_model,
@@ -60,10 +50,6 @@ async function addInventory(
   return pool.query(sql, values)
 }
 
-/* ===============================
-   GET INVENTORY BY CLASSIFICATION ID
-   returns rows array
-================================ */
 async function getInventoryByClassificationId(classification_id) {
   const sql = `
     SELECT i.*, c.classification_name
@@ -75,9 +61,6 @@ async function getInventoryByClassificationId(classification_id) {
   return pool.query(sql, [classification_id])
 }
 
-/* ===============================
-   GET INVENTORY BY ID
-================================ */
 async function getInventoryById(inv_id) {
   const sql = `SELECT * FROM inventory WHERE inv_id = $1`
   return pool.query(sql, [inv_id])

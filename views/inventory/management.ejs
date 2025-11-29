@@ -1,14 +1,23 @@
-<%- include('../partials/header') %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{title}}</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  {{{nav}}}
 
-<h1>Inventory Management</h1>
+  <h1>Inventory Management</h1>
 
-<% if (message) { %>
-  <p class="notice"><%= message %></p>
-<% } %>
+  {{!-- Flash message --}}
+  {{#if notice}}
+    <div class="flash-message">{{notice}}</div>
+  {{/if}}
 
-<ul>
-    <li><a href="/inv/add-classification">Add New Classification</a></li>
-    <li><a href="/inv/add-inventory">Add New Inventory</a></li>
-</ul>
-
-<%- include('../partials/footer') %>
+  <div class="management-links">
+    <p><a href="/inv/add-classification">Add New Classification</a></p>
+    <p><a href="/inv/add-inventory">Add New Inventory</a></p>
+  </div>
+</body>
+</html>

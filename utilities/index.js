@@ -2,9 +2,7 @@ const invModel = require("../models/inventory-model")
 
 const utilities = {}
 
-/* ===============================
-   BUILD NAVIGATION MENU
-================================ */
+// Build navigation menu dynamically
 utilities.getNav = async function () {
   try {
     const data = await invModel.getClassifications()
@@ -27,9 +25,7 @@ utilities.getNav = async function () {
   }
 }
 
-/* ===============================
-   BUILD CLASSIFICATION SELECT LIST
-================================ */
+// Build classification select list
 utilities.buildClassificationList = function (classificationData, selectedId) {
   let select = `<select name="classification_id" id="classification_id" required>`
   select += `<option value="">Choose a Classification</option>`
@@ -45,12 +41,9 @@ utilities.buildClassificationList = function (classificationData, selectedId) {
   return select
 }
 
-/* ===============================
-   BUILD CLASSIFICATION GRID
-================================ */
+// Build vehicle grid
 utilities.buildClassificationGrid = function (vehicles) {
   let grid = '<div class="vehicle-grid">'
-
   vehicles.forEach(vehicle => {
     grid += `
       <div class="vehicle-card">
@@ -62,14 +55,11 @@ utilities.buildClassificationGrid = function (vehicles) {
       </div>
     `
   })
-
   grid += "</div>"
   return grid
 }
 
-/* ===============================
-   BUILD VEHICLE DETAIL PAGE
-================================ */
+// Build vehicle detail page
 utilities.buildVehicleDetail = function (vehicle) {
   return `
     <section class="vehicle-detail">
@@ -83,9 +73,7 @@ utilities.buildVehicleDetail = function (vehicle) {
   `
 }
 
-/* ===============================
-   ERROR HANDLER WRAPPER
-================================ */
+// Error handler wrapper
 utilities.handleErrors = function (fn) {
   return function (req, res, next) {
     Promise.resolve(fn(req, res, next)).catch(next)
